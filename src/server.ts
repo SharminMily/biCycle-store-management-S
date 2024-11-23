@@ -3,8 +3,6 @@ import config from './app/config';
 
 import mongoose from 'mongoose';
 
-main().catch((err) => console.log(err));
-
 async function main() {
   try {
     await mongoose.connect(config.mongodb_url as string);
