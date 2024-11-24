@@ -103,7 +103,7 @@ const getDeleteProduct = async (req: Request, res: Response) => {
 
 
 
-export const StudentControllers = {
+export const ProductControllers = {
   createProduct,
   getAllProduct,
   getSingleProduct,

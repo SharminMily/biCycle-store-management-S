@@ -1,16 +1,19 @@
 import express from 'express'
-import { StudentControllers } from './product.controller'
+import { ProductControllers } from './product.controller';
+
 
 const router = express.Router()
 
-router.post('/create-product', StudentControllers.createProduct);
+router.post('/create-product', ProductControllers.createProduct);
 
-router.get('/', StudentControllers.getAllProduct);
+router.get('/', ProductControllers.getAllProduct);
 
-router.get('/:id', StudentControllers.getSingleProduct);
+router.get('/:id', ProductControllers.getSingleProduct);
 
-router.put('/:id', StudentControllers.getUpdateProduct);
+router.put('/:id', ProductControllers.getUpdateProduct);
 
-router.delete('/:id', StudentControllers.getDeleteProduct)
+router.delete('/:id', ProductControllers.getDeleteProduct)
+
+router.get('/', ProductControllers.getAllProduct);
 
 export const ProductRoutes =  router;

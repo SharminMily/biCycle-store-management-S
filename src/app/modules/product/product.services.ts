@@ -28,10 +28,18 @@ const getDeleteProduct = async(id: string) => {
     return result;
 }
 
+
+const getSearchProduct = async(searchTerm: string) => {
+    const result = await ProductModel.find(searchTerm);
+    return result;
+}
+
+
 export const ProductServices = {
     createProductInDB,
     getAllProductFromDB,
     getSingleProduct ,
     getUpdateProduct,
     getDeleteProduct,
+    getSearchProduct
 }
