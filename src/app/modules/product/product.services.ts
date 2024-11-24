@@ -17,7 +17,10 @@ const getSingleProduct = async(id: string) => {
 }
 
 const getUpdateProduct = async(id: string, data: Product) => {
-    const result = await ProductModel.findByIdAndUpdate(id, data);
+    const result = await ProductModel.findByIdAndUpdate(id, data,{
+        new: true,
+        runValidators: true,
+    });
     return result;
 }
 const getDeleteProduct = async(id: string) => {

@@ -18,7 +18,10 @@ const getSingleOrder = async(id: string) => {
 }
 
 const getUpdateOrder = async(id: string, data: IOrder) => {
-    const result = await OrderModel.findByIdAndUpdate(id, data);
+    const result = await OrderModel.findByIdAndUpdate(id, data, {
+        new: true,
+        runValidators: true,
+    });
     return result;
 }
 const getDeleteOrder = async(id: string) => {
