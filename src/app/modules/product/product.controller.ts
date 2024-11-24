@@ -23,7 +23,9 @@ const createProduct = async (req: Request, res: Response) => {
 
 const getAllProduct = async (req: Request, res: Response) => {
   try {
-    const result = await ProductServices.getAllProductFromDB();
+    const { searchTerm } = req.query;
+
+    const result = await ProductServices.getAllProductFromDB(searchTerm as string);
 
     //send response
     res.status(200).json({
@@ -103,10 +105,12 @@ const getDeleteProduct = async (req: Request, res: Response) => {
 
 
 
+
 export const ProductControllers = {
   createProduct,
   getAllProduct,
   getSingleProduct,
   getUpdateProduct,
   getDeleteProduct,
+
 };
