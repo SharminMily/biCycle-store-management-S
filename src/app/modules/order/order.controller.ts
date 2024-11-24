@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
-import { ProductServices } from './product.services';
+import { OrderServices } from './order.services';
 
-const createProduct = async (req: Request, res: Response) => {
+const createOrder = async (req: Request, res: Response) => {
   try {
-    const { product: productData } = req.body;
+    const { order: orderData } = req.body;
 
-    const result = await ProductServices.createProductInDB(productData);
+    const result = await OrderServices.orderCreate(orderData);
     //send response
     res.status(200).json({
       success: true,
-      message: 'Product is create successfully',
+      message: 'order is create successfully',
       data: result,
     });
   } catch (error) {
@@ -21,9 +21,9 @@ const createProduct = async (req: Request, res: Response) => {
   }
 };
 
-const getAllProduct = async (req: Request, res: Response) => {
+const getAllOrder = async (req: Request, res: Response) => {
   try {
-    const result = await ProductServices.getAllProductFromDB();
+    const result = await OrderServices.getAllOrder();
 
     //send response
     res.status(200).json({
@@ -40,11 +40,11 @@ const getAllProduct = async (req: Request, res: Response) => {
   }
 };
 
-const getSingleProduct = async (req: Request, res: Response) => {
+const getSingleOrder = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
 
-    const result = await ProductServices.getSingleProduct(id);
+    const result = await OrderServices.getSingleOrder(id);
     //send response
     res.status(200).json({
       success: true,
@@ -60,12 +60,12 @@ const getSingleProduct = async (req: Request, res: Response) => {
   }
 };
 
-const getUpdateProduct = async (req: Request, res: Response) => {
+const getUpdateOrder = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const body = req.body;
 
-    const result = await ProductServices.getUpdateProduct(id, body);
+    const result = await OrderServices.getUpdateOrder(id, body);
     res.status(200).json({
       success: true,
       message: 'Product updated successfully',
@@ -81,11 +81,11 @@ const getUpdateProduct = async (req: Request, res: Response) => {
 };
 
 
-const getDeleteProduct = async (req: Request, res: Response) => {
+const getDeleteOrder = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
 
-    const result = await ProductServices.getDeleteProduct(id);
+    const result = await OrderServices.getDeleteOrder(id);
     //send response
     res.status(200).json({
       success: true,
@@ -103,10 +103,10 @@ const getDeleteProduct = async (req: Request, res: Response) => {
 
 
 
-export const StudentControllers = {
-  createProduct,
-  getAllProduct,
-  getSingleProduct,
-  getUpdateProduct,
-  getDeleteProduct,
+export const OrderControllers = {
+    createOrder,
+    getAllOrder,
+  getSingleOrder,
+  getUpdateOrder,
+  getDeleteOrder,
 };
