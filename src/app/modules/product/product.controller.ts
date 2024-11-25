@@ -25,9 +25,17 @@ const getAllProduct = async (req: Request, res: Response) => {
   try {
     const { searchTerm } = req.query;
 
-    const result = await ProductServices.getAllProductFromDB(searchTerm as string);
-
-    //send response
+    const result = await ProductServices.getAllProductFromDB(
+      searchTerm as string,
+    );
+    if (!result || result.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No products found matching your search criteria',
+        error: 'Products not found',
+      });
+    }
+       //send response
     res.status(200).json({
       success: true,
       message: 'Product get successfully',
@@ -47,7 +55,13 @@ const getSingleProduct = async (req: Request, res: Response) => {
     const id = req.params.id;
 
     const result = await ProductServices.getSingleProduct(id);
-    //send response
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found ',
+        error: 'Resource not found',
+      });
+    }   
     res.status(200).json({
       success: true,
       message: 'Single Product get successfully',
@@ -68,6 +82,13 @@ const getUpdateProduct = async (req: Request, res: Response) => {
     const body = req.body;
 
     const result = await ProductServices.getUpdateProduct(id, body);
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found ',
+        error: 'Resource not found',
+      });
+    }
     res.status(200).json({
       success: true,
       message: 'Product updated successfully',
@@ -82,12 +103,18 @@ const getUpdateProduct = async (req: Request, res: Response) => {
   }
 };
 
-
 const getDeleteProduct = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
 
     const result = await ProductServices.getDeleteProduct(id);
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+        error: 'Resource not found',
+      });
+    }
     //send response
     res.status(200).json({
       success: true,
@@ -103,14 +130,10 @@ const getDeleteProduct = async (req: Request, res: Response) => {
   }
 };
 
-
-
-
 export const ProductControllers = {
   createProduct,
   getAllProduct,
   getSingleProduct,
   getUpdateProduct,
   getDeleteProduct,
-
 };

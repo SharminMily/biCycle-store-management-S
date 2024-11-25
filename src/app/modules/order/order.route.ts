@@ -1,16 +1,17 @@
-import express from 'express'
+import express from 'express';
 import { OrderControllers } from './order.controller';
 
-const router = express.Router()
+const router = express.Router();
 
-router.post('/create-order', OrderControllers.createOrder);
 
-router.get('/', OrderControllers.getAllOrder);
-
+// console.log("OrderControllers:", OrderControllers);
+router.get('/revenue', OrderControllers.calculateAllOrder);
 router.get('/:id', OrderControllers.getSingleOrder);
-
+router.get('/', OrderControllers.getAllOrder);
+router.post('/', OrderControllers.createOrder);
 router.put('/:id', OrderControllers.getUpdateOrder);
+router.delete('/:id', OrderControllers.getDeleteOrder);
 
-router.delete('/:id', OrderControllers.getDeleteOrder)
 
-export const OrderRoutes =  router;
+
+export const OrderRoutes = router;
