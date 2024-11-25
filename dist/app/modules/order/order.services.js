@@ -1,39 +1,50 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrderServices = void 0;
+const product_model_1 = require("../product/product.model");
 const order_model_1 = require("./order.model");
-const orderCreate = (order) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_model_1.OrderModel.create(order);
+const orderCreate = async (order) => {
+    const { product, quantity } = order;
+    // find cicyle
+    const productData = await product_model_1.ProductModel.findById(product);
+    if (!productData) {
+        throw new Error('Product not found');
+    }
+    // check stock quantity
+    if (productData.quantity < quantity) {
+        throw new Error('Insufficient stock');
+    }
+    // quantity update
+    productData.quantity -= quantity;
+    if (productData.quantity === 0) {
+        productData.inStock = false;
+    }
+    // save cycle
+    await productData.save();
+    // new order create
+    // order save
+    const result = await order_model_1.OrderModel.create(order);
     return result;
-});
-const getAllOrder = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_model_1.OrderModel.find();
+};
+const getAllOrder = async () => {
+    const result = await order_model_1.OrderModel.find();
     return result;
-});
-const getSingleOrder = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_model_1.OrderModel.findById(id);
+};
+const getSingleOrder = async (id) => {
+    const result = await order_model_1.OrderModel.findById(id);
     return result;
-});
-const getUpdateOrder = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_model_1.OrderModel.findByIdAndUpdate(id, data, {
+};
+const getUpdateOrder = async (id, data) => {
+    const result = await order_model_1.OrderModel.findByIdAndUpdate(id, data, {
         new: true,
         runValidators: true,
     });
     return result;
-});
-const getDeleteOrder = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_model_1.OrderModel.findByIdAndDelete(id);
+};
+const getDeleteOrder = async (id) => {
+    const result = await order_model_1.OrderModel.findByIdAndDelete(id);
     return result;
-});
+};
 exports.OrderServices = {
     orderCreate,
     getAllOrder,

@@ -5,6 +5,7 @@ const mongoose_1 = require("mongoose");
 const productSchema = new mongoose_1.Schema({
     id: { type: String, required: true, unique: true },
     name: { type: String, required: true, message: '{VALUE} is not valid' },
+    email: { type: String, required: true, message: '{VALUE} is not valid' },
     brand: { type: String, required: true },
     price: {
         type: Number,
@@ -18,6 +19,6 @@ const productSchema = new mongoose_1.Schema({
     },
     description: { type: String, required: true },
     quantity: { type: Number, required: true },
-    inStock: { type: Boolean, required: true },
+    inStock: { type: Boolean, default: true },
 }, { timestamps: true });
 exports.ProductModel = (0, mongoose_1.model)('Product', productSchema);

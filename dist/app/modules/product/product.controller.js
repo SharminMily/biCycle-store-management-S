@@ -1,20 +1,11 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductControllers = void 0;
 const product_services_1 = require("./product.services");
-const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createProduct = async (req, res) => {
     try {
         const { product: productData } = req.body;
-        const result = yield product_services_1.ProductServices.createProductInDB(productData);
+        const result = await product_services_1.ProductServices.createProductInDB(productData);
         //send response
         res.status(200).json({
             success: true,
@@ -29,11 +20,18 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             error: error,
         });
     }
-});
-const getAllProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getAllProduct = async (req, res) => {
     try {
         const { searchTerm } = req.query;
-        const result = yield product_services_1.ProductServices.getAllProductFromDB(searchTerm);
+        const result = await product_services_1.ProductServices.getAllProductFromDB(searchTerm);
+        if (!result || result.length === 0) {
+            res.status(404).json({
+                success: false,
+                message: 'No products found matching your search criteria',
+                error: 'Products not found',
+            });
+        }
         //send response
         res.status(200).json({
             success: true,
@@ -48,12 +46,18 @@ const getAllProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             error: error,
         });
     }
-});
-const getSingleProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getSingleProduct = async (req, res) => {
     try {
         const id = req.params.id;
-        const result = yield product_services_1.ProductServices.getSingleProduct(id);
-        //send response
+        const result = await product_services_1.ProductServices.getSingleProduct(id);
+        if (!result) {
+            res.status(404).json({
+                success: false,
+                message: 'Product not found ',
+                error: 'Resource not found',
+            });
+        }
         res.status(200).json({
             success: true,
             message: 'Single Product get successfully',
@@ -67,12 +71,19 @@ const getSingleProduct = (req, res) => __awaiter(void 0, void 0, void 0, functio
             error: error,
         });
     }
-});
-const getUpdateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getUpdateProduct = async (req, res) => {
     try {
         const id = req.params.id;
         const body = req.body;
-        const result = yield product_services_1.ProductServices.getUpdateProduct(id, body);
+        const result = await product_services_1.ProductServices.getUpdateProduct(id, body);
+        if (!result) {
+            res.status(404).json({
+                success: false,
+                message: 'Product not found ',
+                error: 'Resource not found',
+            });
+        }
         res.status(200).json({
             success: true,
             message: 'Product updated successfully',
@@ -86,11 +97,18 @@ const getUpdateProduct = (req, res) => __awaiter(void 0, void 0, void 0, functio
             error: error,
         });
     }
-});
-const getDeleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getDeleteProduct = async (req, res) => {
     try {
         const id = req.params.id;
-        const result = yield product_services_1.ProductServices.getDeleteProduct(id);
+        const result = await product_services_1.ProductServices.getDeleteProduct(id);
+        if (!result) {
+            res.status(404).json({
+                success: false,
+                message: 'Product not found',
+                error: 'Resource not found',
+            });
+        }
         //send response
         res.status(200).json({
             success: true,
@@ -105,7 +123,7 @@ const getDeleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, functio
             error: error,
         });
     }
-});
+};
 exports.ProductControllers = {
     createProduct,
     getAllProduct,

@@ -2,13 +2,11 @@ import { ProductModel } from '../product/product.model';
 import { IOrder } from './order.interface';
 import { OrderModel } from './order.model';
 
-
-
 const orderCreate = async (order: IOrder) => {
   const { product, quantity } = order;
   // find cicyle
   const productData = await ProductModel.findById(product);
-  
+
   if (!productData) {
     throw new Error('Product not found');
   }
@@ -27,13 +25,11 @@ const orderCreate = async (order: IOrder) => {
   // save cycle
   await productData.save();
   // new order create
- 
 
   // order save
   const result = await OrderModel.create(order);
   return result;
 };
-
 
 const getAllOrder = async () => {
   const result = await OrderModel.find();
@@ -56,11 +52,6 @@ const getDeleteOrder = async (id: string) => {
   const result = await OrderModel.findByIdAndDelete(id);
   return result;
 };
-
-
-
-
-
 
 export const OrderServices = {
   orderCreate,

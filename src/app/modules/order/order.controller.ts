@@ -4,7 +4,6 @@ import { ProductModel } from '../product/product.model';
 import { OrderModel } from './order.model';
 import mongoose from 'mongoose';
 
-
 const createOrder = async (req: Request, res: Response) => {
   try {
     const { email, product, quantity } = req.body;
@@ -51,7 +50,7 @@ const getAllOrder = async (req: Request, res: Response) => {
   try {
     const result = await OrderServices.getAllOrder();
     if (!result) {
-       res.status(404).json({
+      res.status(404).json({
         success: false,
         message: 'Order not found',
         error: 'Resource not found',
@@ -78,13 +77,13 @@ const getSingleOrder = async (req: Request, res: Response) => {
 
     const result = await OrderServices.getSingleOrder(id);
     if (!result) {
-     res.status(404).json({
+      res.status(404).json({
         success: false,
         message: 'Order not found ',
         error: 'Resource not found',
       });
     }
-     //send response
+    //send response
     res.status(200).json({
       success: true,
       message: 'Single Product get successfully',
@@ -153,14 +152,13 @@ const getDeleteOrder = async (req: Request, res: Response) => {
   }
 };
 
-
 const calculateAllOrder = async (req: Request, res: Response) => {
   try {
     const result = await OrderModel.aggregate([
       {
         $group: {
           _id: null, // Group all orders
-          totalRevenue: { $sum: "$totalPrice" }, // Calculate total revenue
+          totalRevenue: { $sum: '$totalPrice' }, // Calculate total revenue
         },
       },
     ]);
@@ -171,8 +169,7 @@ const calculateAllOrder = async (req: Request, res: Response) => {
       message: 'Revenue calculated successfully',
       status: true,
       data: { totalRevenue },
-    })
-
+    });
   } catch (error) {
     res.status(500).json({
       message: 'Something went wrong',
@@ -180,8 +177,7 @@ const calculateAllOrder = async (req: Request, res: Response) => {
       error: error,
     });
   }
-}
-
+};
 
 export const OrderControllers = {
   createOrder,
@@ -189,5 +185,5 @@ export const OrderControllers = {
   getSingleOrder,
   getUpdateOrder,
   getDeleteOrder,
-  calculateAllOrder 
+  calculateAllOrder,
 };
