@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { ProductServices } from './product.services';
+import { ProductModel } from './product.model';
 
 const createProduct = async (req: Request, res: Response) => {
   try {
@@ -8,8 +9,8 @@ const createProduct = async (req: Request, res: Response) => {
     const result = await ProductServices.createProductInDB(productData);
     //send response
     res.status(200).json({
+      message: 'Bicycle created successfully',
       success: true,
-      message: 'Product is create successfully',
       data: result,
     });
   } catch (error) {
@@ -105,21 +106,22 @@ const getUpdateProduct = async (req: Request, res: Response) => {
 
 const getDeleteProduct = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
 
-    const result = await ProductServices.getDeleteProduct(id);
+    const result = await ProductModel.findByIdAndDelete(id);
     if (!result) {
       res.status(404).json({
         success: false,
         message: 'Product not found',
         error: 'Resource not found',
+        data: {},
       });
     }
     //send response
     res.status(200).json({
       success: true,
       message: 'product delete successfully',
-      data: result,
+      data: {},
     });
   } catch (error) {
     res.status(500).json({

@@ -127,21 +127,22 @@ const getUpdateOrder = async (req: Request, res: Response) => {
 
 const getDeleteOrder = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
 
-    const result = await OrderServices.getDeleteOrder(id);
+    const result = await OrderModel.findByIdAndDelete(id);
     if (!result) {
       res.status(404).json({
         success: false,
         message: 'Order not found to delete',
         error: 'Resource not found',
+        data: [],
       });
     }
     //send response
     res.status(200).json({
       success: true,
-      message: 'product delete successfully',
-      data: result,
+      message: 'Order delete successfully',
+      data: [],
     });
   } catch (error) {
     res.status(500).json({

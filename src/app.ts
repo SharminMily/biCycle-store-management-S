@@ -1,7 +1,8 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
-import { ProductRoutes } from './app/modules/product/product.route';
+
 import { OrderRoutes } from './app/modules/order/order.route';
+import { ProductRoutes } from './app/modules/product/product.route';
 
 const app: Application = express();
 
@@ -10,8 +11,8 @@ app.use(express.json());
 app.use(cors());
 
 //aplication router
-app.use('/api/v1/products', ProductRoutes);
-app.use('/api/v1/orders', OrderRoutes);
+app.use('/api/products', ProductRoutes);
+app.use('/api/orders', OrderRoutes);
 
 const getAController = (req: Request, res: Response) => {
   res.send();

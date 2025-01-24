@@ -2,6 +2,9 @@ import { Product } from './product.interface';
 import { ProductModel } from './product.model';
 
 const createProductInDB = async (product: Product) => {
+  // if (await ProductModel.isUserExists(product.id)) {
+  //   throw new Error('User already exists!');
+  // }
   const result = await ProductModel.create(product);
   return result;
 };

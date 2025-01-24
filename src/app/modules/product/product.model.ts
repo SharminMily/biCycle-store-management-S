@@ -3,23 +3,25 @@ import { Product } from './product.interface';
 
 const productSchema = new Schema<Product>(
   {
-    id: { type: String, required: true, unique: true },
-    name: { type: String, required: true, message: '{VALUE} is not valid' },
-    email: { type: String, required: true, message: '{VALUE} is not valid' },
-    brand: { type: String, required: true },
-    price: {
-      type: Number,
-      required: true,
-      message: 'Price must be a positive number',
-    },
+    name: { type: String, required: [true, 'Name is required'] },
+    brand: { type: String, required: [true, 'Brand is required'] },
+    price: { type: Number, required: [true, 'Price is required'] },
     type: {
       type: String,
       enum: ['Mountain', 'Road', 'Hybrid', 'BMX', 'Electric'],
-      required: true,
+      required: [true, 'Type is required'],
     },
-    description: { type: String, required: true },
-    quantity: { type: Number, required: true },
-    inStock: { type: Boolean, default: true },
+    description: { type: String, required: [true, 'Description is required'] },
+    quantity: {
+      type: Number,
+      required: [true, 'Quantity is required'],
+      default: 0,
+    },
+    inStock: {
+      type: Boolean,
+      required: [true, 'InStock status is required'],
+      default: false,
+    },
   },
   { timestamps: true },
 );

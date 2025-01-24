@@ -129,20 +129,21 @@ const getUpdateOrder = async (req, res) => {
 };
 const getDeleteOrder = async (req, res) => {
     try {
-        const id = req.params.id;
-        const result = await order_services_1.OrderServices.getDeleteOrder(id);
+        const { id } = req.params;
+        const result = await order_model_1.OrderModel.findByIdAndDelete(id);
         if (!result) {
             res.status(404).json({
                 success: false,
                 message: 'Order not found to delete',
                 error: 'Resource not found',
+                data: [],
             });
         }
         //send response
         res.status(200).json({
             success: true,
-            message: 'product delete successfully',
-            data: result,
+            message: 'Order delete successfully',
+            data: [],
         });
     }
     catch (error) {
@@ -159,7 +160,7 @@ const calculateAllOrder = async (req, res) => {
             {
                 $group: {
                     _id: null, // Group all orders
-                    totalRevenue: { $sum: "$totalPrice" }, // Calculate total revenue
+                    totalRevenue: { $sum: '$totalPrice' }, // Calculate total revenue
                 },
             },
         ]);
@@ -185,5 +186,5 @@ exports.OrderControllers = {
     getSingleOrder,
     getUpdateOrder,
     getDeleteOrder,
-    calculateAllOrder
+    calculateAllOrder,
 };

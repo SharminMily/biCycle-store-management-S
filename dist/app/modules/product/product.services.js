@@ -3,6 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductServices = void 0;
 const product_model_1 = require("./product.model");
 const createProductInDB = async (product) => {
+    // if (await ProductModel.isUserExists(product.id)) {
+    //   throw new Error('User already exists!');
+    // }
     const result = await product_model_1.ProductModel.create(product);
     return result;
 };
