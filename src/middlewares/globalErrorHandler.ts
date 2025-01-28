@@ -10,13 +10,6 @@ import { handleValidationError } from "../helpers/handlerValidationError"
 import { handlerDuplicateError } from "../helpers/handleDuplicateError"
 import { handleGenericError } from "../helpers/handleGenericError"
 
-//Error:
-//Generic Error  - Done
-//1.Duplicate - Done
-//2. Validation - DOne
-//3. Cast Error - Type Casting Error - Done
-//4. Zod Error / Joi
-
 type TErrorResponse = {
     success: boolean
     message: string

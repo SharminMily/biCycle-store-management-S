@@ -6,7 +6,7 @@ import { status } from "http-status";
 
 const register = catchAsync(async(req: Request, res: Response)=>{
     const result = await AuthService.register(req.body);
-
+   
     sendResponse(res,{
         statusCode: status.CREATED,
         status: true,
@@ -17,13 +17,16 @@ const register = catchAsync(async(req: Request, res: Response)=>{
 
 const login = catchAsync(async(req: Request, res: Response)=>{
     const result = await AuthService.login(req.body);
+    const {  accessToken } = result;
 
     sendResponse(res,{
         statusCode: status.ACCEPTED,
         status: true,
         message: "User logged in successfully",
         // token: result?.token,
-        data: result?.user
+        data: {
+            accessToken,        
+          },
     })
 })
 

@@ -27,4 +27,4 @@ This project is an Express application built with TypeScript, MongoDB, and Mongo
 - Not Found Errors: Returns a 404 response if a resource doesn't exist.
 - Insufficient Stock Errors: Prevents orders if the stock is too low.
 
-### Live link : [ https://bicycle-store-two.vercel.app] 
+### Live link : [] 
