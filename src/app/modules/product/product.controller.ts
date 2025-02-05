@@ -1,23 +1,28 @@
 import { Request, Response } from 'express';
 import { ProductServices } from './product.services';
 import { ProductModel } from './product.model';
+import productValidationSchema from './product.validation';
 
 const createProduct = async (req: Request, res: Response) => {
   try {
-    const { product: productData } = req.body;
+    const productData = req.body; 
 
-    const result = await ProductServices.createProductInDB(productData);
-    //send response
+    // ✅ Validate with Zod before saving
+    const parsedData = productValidationSchema.parse(productData);
+
+    const newProduct = new ProductModel(parsedData);
+    await newProduct.save();
+
     res.status(200).json({
       message: 'Bicycle created successfully',
       success: true,
-      data: result,
+      data: newProduct,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Something went Wrong',
-      error: error,
+      message: 'Something went wrong',
+      error: error instanceof Error ? error.message : error,
     });
   }
 };

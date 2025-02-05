@@ -8,45 +8,37 @@ import status from 'http-status';
 import jwt from 'jsonwebtoken';
 
 const register = async (payload: TUser) => {
+  payload.password = await bcrypt.hash(payload.password, 10);
   const result = await User.create(payload);
   return result;
 };
 
 const login = async (payload: TLoginUser) => {
-  // checking if the user is exist
-  const user = await User.findOne({ email: payload?.email }).select(
-    '+password',
-  );
+  // Checking if the user exists
+  const user = await User.findOne({ email: payload?.email }).select('+password');
 
   if (!user) {
-    throw new AppError(status.NOT_FOUND, 'This user is not found !');
+    throw new AppError(status.NOT_FOUND, 'This user is not found!');
   }
-  //if deleted
-  const isDeleted = user?.isDeleted;
-
-  if (isDeleted) {
-    throw new AppError(status.FORBIDDEN, 'This user is deleted !');
+  // If deleted
+  if (user?.isDeleted) {
+    throw new AppError(status.FORBIDDEN, 'This user is deleted!');
   }
-
-  // checking if the user is blocked
-  const userStatus = user?.status;
-
-  if (userStatus === 'blocked') {
-    throw new AppError(status.FORBIDDEN, 'This user is blocked ! !');
+  // Checking if the user is blocked
+  if (user?.status === 'blocked') {
+    throw new AppError(status.FORBIDDEN, 'This user is blocked!');
   }
-  //checking if the password is correct
-  const isPasswordMatched = await bcrypt.compare(
-    payload?.password,
-    user?.password,
-  );
-
+  // Ensure the password is available
+  if (!user.password) {
+    throw new AppError(status.FORBIDDEN, 'Password not found in database!');
+  }
+  // Checking if the password is correct
+ 
+  const isPasswordMatched = await bcrypt.compare(payload?.password, user?.password);
   if (!isPasswordMatched) {
-    throw new Error('Wrong Password!  😈');
+    throw new AppError(status.FORBIDDEN, 'Wrong Password!');
   }
-
-  if (!(await User.isPasswordMatched(payload?.password, user?.password)))
-    throw new AppError(status.FORBIDDEN, 'Password do not matched');
-  //token
+  // Token Generation
   const jwtPayload = {
     userId: user.email,
     role: user.role,

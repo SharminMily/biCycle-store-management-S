@@ -5,12 +5,14 @@ import { OrderRoutes } from './app/modules/order/order.route';
 import { ProductRoutes } from './app/modules/product/product.route';
 import userRouter from './app/modules/user/user.route';
 import authRouter from './app/modules/Auth/auth.route';
-
+import cookieParser from 'cookie-parser'
 const app: Application = express();
 
 //parsers
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true })); 
+app.use(cors({origin: 'http://localhost:5173', credentials: true})); //for access token & cookie
 
 //aplication router
 app.use('/api/products', ProductRoutes);
