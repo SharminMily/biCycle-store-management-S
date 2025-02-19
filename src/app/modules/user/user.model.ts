@@ -1,11 +1,13 @@
 import { model, Schema } from "mongoose";
 import { TUser, userModel } from "./user.interface";
 import bcrypt from 'bcrypt'
+import { v4 as uuidv4 } from 'uuid';
+import config from "../../config";
+
 
 const userSchema = new Schema<TUser, userModel>({ 
-    id: {
-        type: String
-    } , 
+  id: { type: String, unique: true, default: uuidv4 }, 
+    name: { type: String, required: true , trim: true},
     email: {
         type: String,
         required: true,
@@ -17,6 +19,7 @@ const userSchema = new Schema<TUser, userModel>({
             message: '{VALUE} is not a valid email',
           },
           immutable: true,
+           trim: true
     },
     password: {
         type: String,
@@ -41,14 +44,27 @@ const userSchema = new Schema<TUser, userModel>({
         type: Boolean,
         default: false,
     },
+    phone: { type: String, default: "N/A" },
+    address: { type: String, default: "N/A" },
+    city: { type: String, default: "N/A" },
 },
 {
     timestamps: true
 })
 
- // set '' after saving password
- userSchema.post('save', function (doc, next) {
-  doc.password = '';
+
+// userSchema.pre("save", async function (next) {
+//   if (!this.isModified("password")) return next();
+//   const salt = await bcrypt.genSalt(8);
+//   this.password = await bcrypt.hash(this.password, salt);
+//   next();
+// });
+
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  const saltRounds = Number(config.bcrypt_salt_rounds) || 10; // Default to 10 if not set
+  this.password = await bcrypt.hash(this.password, saltRounds);
   next();
 });
 
@@ -56,12 +72,13 @@ userSchema.statics.isUserExistsByCustomId = async function (id: string) {
   return await User.findOne({ id }).select('+password');
 };
 
-userSchema.statics.isPasswordMatched = async function (
-  plainTextPassword,
-  hashedPassword,
-) {
-  return await bcrypt.compare(plainTextPassword, hashedPassword);
-};
+
+// set '' after saving password
+userSchema.post('save', function (doc, next) {
+  doc.password = '';
+  next();
+});
+
 
 
 export const User = model<TUser, userModel>('User', userSchema)

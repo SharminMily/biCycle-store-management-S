@@ -6,8 +6,6 @@ import productValidationSchema from './product.validation';
 const createProduct = async (req: Request, res: Response) => {
   try {
     const productData = req.body; 
-
-    // ✅ Validate with Zod before saving
     const parsedData = productValidationSchema.parse(productData);
 
     const newProduct = new ProductModel(parsedData);
@@ -29,32 +27,31 @@ const createProduct = async (req: Request, res: Response) => {
 
 const getAllProduct = async (req: Request, res: Response) => {
   try {
-    const { searchTerm } = req.query;
-
-    const result = await ProductServices.getAllProductFromDB(
-      searchTerm as string,
-    );
+    const result = await ProductServices.getAllProductFromDB(req.query); 
     if (!result || result.length === 0) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
-        message: 'No products found matching your search criteria',
-        error: 'Products not found',
+        message: "No products found matching your search criteria",
+        error: "Products not found",
       });
     }
-    //send response
+
+    // Send response
     res.status(200).json({
       success: true,
-      message: 'Product get successfully',
+      message: "Products retrieved successfully",
       data: result,
     });
   } catch (error) {
+    //console.error("Error in getAllProduct:", error);
     res.status(500).json({
       success: false,
-      message: 'Something went Wrong',
-      error: error,
+      message: "Something went wrong",
+      error: error.message || error,
     });
   }
 };
+
 
 const getSingleProduct = async (req: Request, res: Response) => {
   try {
@@ -87,7 +84,7 @@ const getUpdateProduct = async (req: Request, res: Response) => {
     const id = req.params.id;
     const body = req.body;
 
-    const result = await ProductServices.getUpdateProduct(id, body);
+    const result = await ProductServices.getUpdateProduct(id,  body, { new: true });
     if (!result) {
       res.status(404).json({
         success: false,

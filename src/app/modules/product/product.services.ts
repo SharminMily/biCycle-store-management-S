@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Product } from './product.interface';
 import { ProductModel } from './product.model';
+import QueryBuilder from '../../../builder/querybuilder';
 
 const createProductInDB = async (product: Product) => {
   // if (await ProductModel.isUserExists(product.id)) {
@@ -9,27 +11,47 @@ const createProductInDB = async (product: Product) => {
   return result;
 };
 
-const getAllProductFromDB = async (searchTerm?: string) => {
-  let query = {};
-  if (searchTerm) {
-    query = {
-      $or: [
-        { name: { $regex: searchTerm, $options: 'i' } }, // Matches `name`
-        { brand: { $regex: searchTerm, $options: 'i' } }, // Matches `brand`
-        { type: { $regex: searchTerm, $options: 'i' } }, // Matches `type`
-      ],
-    };
+const getAllProductFromDB = async (queryParams: any) => {
+  try {
+    console.log("Received Query Params:", queryParams); // Debugging
+
+    const query = ProductModel.find();
+    const queryBuilder = new QueryBuilder(query, queryParams)
+      .search(["name", "brand", "type"])
+      .filter()
+      .paginate()
+      .sort()
+      .select();
+
+    console.log("Final Query Before Execution:", queryBuilder.modelQuery.getQuery()); // 🔍 Debugging
+
+    const result = await queryBuilder.modelQuery;
+    console.log("Final Query Results:", result.length); // 🔍 Debugging
+
+    return result;
+  } catch (error) {
+    console.error("Error in getAllProductFromDB:", error);
+    throw new Error("Failed to fetch products from DB");
   }
-  const result = await ProductModel.find(query);
-  return result;
 };
+
+
 
 const getSingleProduct = async (id: string) => {
   const result = await ProductModel.findById(id);
   return result;
 };
 
-const getUpdateProduct = async (id: string, data: Product) => {
+
+
+
+
+
+
+
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+const getUpdateProduct = async (id: string, data: Product, p0?: { new: boolean; }) => {
   const result = await ProductModel.findByIdAndUpdate(id, data, {
     new: true,
     runValidators: true,

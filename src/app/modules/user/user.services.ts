@@ -2,12 +2,10 @@
 import { TUser } from "./user.interface";
 import { User } from "./user.model";
 
-const createUser = async(payload: TUser) => {
+const createUser = async(payload: TUser): Promise< TUser> => {
      const result = await User.create(payload);
       return result;
 }
-
-
 
 const getUser = async () => {
     const result = await User.find()

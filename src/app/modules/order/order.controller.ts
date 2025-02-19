@@ -1,51 +1,41 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { OrderServices } from './order.services';
 import { ProductModel } from '../product/product.model';
-import { OrderModel } from './order.model';
 import mongoose from 'mongoose';
+import Order from './order.model';
+import catchAsync from '../../../utils/catchAsync';
+import sendResponse from '../../../utils/sendResponse';
+import httpStatus from "http-status";
 
-const createOrder = async (req: Request, res: Response) => {
-  try {
-    const { email, product, quantity } = req.body;
+interface AuthenticatedRequest extends Request {
+  user?: { email: string; role: string };
+}
 
-    if (mongoose.Types.ObjectId.isValid(product)) {
-      const foundProduct = await ProductModel.findById(product);
-      if (foundProduct) {
-        if (foundProduct.quantity >= quantity) {
-          const countedTotalPrice = foundProduct.price * quantity;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+const createOrder = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const user =  req.user._id ;
 
-          foundProduct.quantity -= quantity;
-          if (foundProduct.quantity === 0) {
-            foundProduct.inStock = false;
-          }
-          await foundProduct.save();
+  const order = await OrderServices.orderCreate(user, req.body, req.ip!);
 
-          const newOrder = new OrderModel({
-            email,
-            product,
-            quantity,
-            totalPrice: countedTotalPrice,
-          });
-          await newOrder.save();
+    sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    message: "Order placed successfully",
+    data: order, 
+  });
+});
 
-          res.status(201).json({
-            message: 'Order created successfully',
-            status: true,
-            data: newOrder,
-          });
-        } else {
-          res.status(400).json({ message: 'Insufficient stock available' });
-        }
-      } else {
-        res.status(404).json({ message: 'Product not found' });
-      }
-    } else {
-      res.status(400).json({ message: 'Invalid product ID' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error });
-  }
-};
+const verifyPayment = catchAsync(async (req, res) => {
+  const result = await OrderServices.verifyPayment(req.query.sp_trxn_id as string);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    message: "Order verified successfully",
+    data: result, // Now includes full order, user, and product details
+  });
+});
+
+
+//
 const getAllOrder = async (req: Request, res: Response) => {
   try {
     const result = await OrderServices.getAllOrder();
@@ -129,7 +119,7 @@ const getDeleteOrder = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const result = await OrderModel.findByIdAndDelete(id);
+    const result = await Order.findByIdAndDelete(id);
     if (!result) {
       res.status(404).json({
         success: false,
@@ -155,7 +145,7 @@ const getDeleteOrder = async (req: Request, res: Response) => {
 
 const calculateAllOrder = async (req: Request, res: Response) => {
   try {
-    const result = await OrderModel.aggregate([
+    const result = await Order.aggregate([
       {
         $group: {
           _id: null, // Group all orders
@@ -182,6 +172,7 @@ const calculateAllOrder = async (req: Request, res: Response) => {
 
 export const OrderControllers = {
   createOrder,
+  verifyPayment,
   getAllOrder,
   getSingleOrder,
   getUpdateOrder,

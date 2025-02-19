@@ -3,11 +3,15 @@
 import catchAsync from "../../../utils/catchAsync";
 import sendResponse from "../../../utils/sendResponse";
 import { userServices } from "./user.services";
+import { v4 as uuidv4 } from 'uuid';
 
 import { status } from 'http-status';
 
 const createUser = catchAsync(async (req, res) => {
     const payload = req.body;
+    if (!payload.id) {
+      payload.id = uuidv4(); // Generates a unique UUID
+    }
     const result = await userServices.createUser(payload);
   
     sendResponse(res, {

@@ -12,7 +12,18 @@ const app: Application = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true })); 
-app.use(cors({origin: 'http://localhost:5173', credentials: true})); //for access token & cookie
+app.use(
+  cors({
+    origin: [
+      "https://bicycle-store-fontend.vercel.app",
+      "http://localhost:5173", // Add another origin here
+    ],
+    credentials: true,
+  })
+);
+
+    
+    // for access token & cookie
 
 //aplication router
 app.use('/api/products', ProductRoutes);

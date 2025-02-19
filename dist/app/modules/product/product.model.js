@@ -6,6 +6,7 @@ const productSchema = new mongoose_1.Schema({
     name: { type: String, required: [true, 'Name is required'] },
     brand: { type: String, required: [true, 'Brand is required'] },
     price: { type: Number, required: [true, 'Price is required'] },
+    image: { type: String, required: [true, 'Image is required'] },
     type: {
         type: String,
         enum: ['Mountain', 'Road', 'Hybrid', 'BMX', 'Electric'],
@@ -19,7 +20,6 @@ const productSchema = new mongoose_1.Schema({
     },
     inStock: {
         type: Boolean,
-        required: [true, 'InStock status is required'],
         default: false,
     },
 }, { timestamps: true });

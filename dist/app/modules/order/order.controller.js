@@ -5,51 +5,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrderControllers = void 0;
 const order_services_1 = require("./order.services");
-const product_model_1 = require("../product/product.model");
-const order_model_1 = require("./order.model");
-const mongoose_1 = __importDefault(require("mongoose"));
-const createOrder = async (req, res) => {
-    try {
-        const { email, product, quantity } = req.body;
-        if (mongoose_1.default.Types.ObjectId.isValid(product)) {
-            const foundProduct = await product_model_1.ProductModel.findById(product);
-            if (foundProduct) {
-                if (foundProduct.quantity >= quantity) {
-                    const countedTotalPrice = foundProduct.price * quantity;
-                    foundProduct.quantity -= quantity;
-                    if (foundProduct.quantity === 0) {
-                        foundProduct.inStock = false;
-                    }
-                    await foundProduct.save();
-                    const newOrder = new order_model_1.OrderModel({
-                        email,
-                        product,
-                        quantity,
-                        totalPrice: countedTotalPrice,
-                    });
-                    await newOrder.save();
-                    res.status(201).json({
-                        message: 'Order created successfully',
-                        status: true,
-                        data: newOrder,
-                    });
-                }
-                else {
-                    res.status(400).json({ message: 'Insufficient stock available' });
-                }
-            }
-            else {
-                res.status(404).json({ message: 'Product not found' });
-            }
-        }
-        else {
-            res.status(400).json({ message: 'Invalid product ID' });
-        }
-    }
-    catch (error) {
-        res.status(500).json({ message: 'Internal server error', error });
-    }
-};
+const order_model_1 = __importDefault(require("./order.model"));
+const catchAsync_1 = __importDefault(require("../../../utils/catchAsync"));
+const sendResponse_1 = __importDefault(require("../../../utils/sendResponse"));
+const http_status_1 = __importDefault(require("http-status"));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+const createOrder = (0, catchAsync_1.default)(async (req, res, next) => {
+    const user = req.user._id;
+    const order = await order_services_1.OrderServices.orderCreate(user, req.body, req.ip);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.CREATED,
+        message: "Order placed successfully",
+        data: order,
+    });
+});
+const verifyPayment = (0, catchAsync_1.default)(async (req, res) => {
+    const result = await order_services_1.OrderServices.verifyPayment(req.query.sp_trxn_id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.CREATED,
+        message: "Order verified successfully",
+        data: result, // Now includes full order, user, and product details
+    });
+});
+//
 const getAllOrder = async (req, res) => {
     try {
         const result = await order_services_1.OrderServices.getAllOrder();
@@ -130,7 +108,7 @@ const getUpdateOrder = async (req, res) => {
 const getDeleteOrder = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await order_model_1.OrderModel.findByIdAndDelete(id);
+        const result = await order_model_1.default.findByIdAndDelete(id);
         if (!result) {
             res.status(404).json({
                 success: false,
@@ -156,7 +134,7 @@ const getDeleteOrder = async (req, res) => {
 };
 const calculateAllOrder = async (req, res) => {
     try {
-        const result = await order_model_1.OrderModel.aggregate([
+        const result = await order_model_1.default.aggregate([
             {
                 $group: {
                     _id: null, // Group all orders
@@ -182,6 +160,7 @@ const calculateAllOrder = async (req, res) => {
 };
 exports.OrderControllers = {
     createOrder,
+    verifyPayment,
     getAllOrder,
     getSingleOrder,
     getUpdateOrder,
