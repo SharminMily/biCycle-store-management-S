@@ -4,22 +4,26 @@ import sendResponse from "../../../utils/sendResponse";
 import { AuthService } from "./auth.service";
 import { status } from "http-status";
 
+
 const register = catchAsync(async(req: Request, res: Response)=>{
     const result = await AuthService.register(req.body);
-   
+    const {  accessToken } = result;
     sendResponse(res,{
         statusCode: status.CREATED,
         status: true,
         message: "User registered successfully",
-        data: result
+        token: result?.token,
+        data: {
+            accessToken,        
+          },
     })   
 })
+
 
 const login = catchAsync(async(req: Request, res: Response)=>{
     const result = await AuthService.login(req.body);
     const {  accessToken } = result;
-
-    sendResponse(res,{
+     sendResponse(res,{
         statusCode: status.ACCEPTED,
         status: true,
         message: "User logged in successfully",

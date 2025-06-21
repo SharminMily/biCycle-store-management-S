@@ -14,27 +14,24 @@ const auth = (...requiredRoles) => {
         try {
             const authHeader = req.headers.authorization;
             if (!authHeader || !authHeader.startsWith('Bearer ')) {
-                // console.error("⛔ No token found in request headers!");
+                console.error("⛔ No token found in request headers!");
                 throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'Token missing! You are not authorized.');
             }
             const token = authHeader.split(' ')[1];
-            // console.log("🔹 Received Token:", token);
-            // Verify Token
+            console.log("🔹 Received Token:", token);
             let decoded;
             try {
                 decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_web_token);
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
             }
             catch (error) {
-                //console.error("⛔ JWT Verification Failed:", error.message);
+                console.error("⛔ JWT Verification Failed:", error.message);
                 throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'Invalid or expired token');
             }
-            // console.log("✅ Token Decoded:", decoded);
+            console.log("✅ Token Decoded:", decoded);
             const { role, user: userId } = decoded;
-            // Fetch user data from DB
             const userAuth = await user_model_1.User.findOne({ _id: userId });
             if (!userAuth) {
-                // console.error("⛔ User not found for token:", userId);
+                console.error("⛔ User not found for token:", userId);
                 throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'User not found!');
             }
             if (userAuth.status === 'blocked') {
@@ -47,7 +44,7 @@ const auth = (...requiredRoles) => {
             next();
         }
         catch (error) {
-            //console.error("⛔ Auth Middleware Error:", error.message);
+            console.error("⛔ Auth Middleware Error:", error.message);
             throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'Invalid or expired token');
         }
     });

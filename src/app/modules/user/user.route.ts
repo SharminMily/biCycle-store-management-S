@@ -16,6 +16,7 @@ userRouter.delete('/:id',  auth('admin'), userController.getDeletedUser)
 
 // userRouter.get('/', auth(USER_ROLE.admin), userController.getUser);
 
-userRouter.get('/',  userController.getUser);
+userRouter.get('/', auth('admin'),  userController.getUser);
+
 
 export default userRouter

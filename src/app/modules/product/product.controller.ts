@@ -35,15 +35,12 @@ const getAllProduct = async (req: Request, res: Response) => {
         error: "Products not found",
       });
     }
-
-    // Send response
     res.status(200).json({
       success: true,
       message: "Products retrieved successfully",
       data: result,
     });
-  } catch (error) {
-    //console.error("Error in getAllProduct:", error);
+  } catch (error) {  
     res.status(500).json({
       success: false,
       message: "Something went wrong",
@@ -119,7 +116,7 @@ const getDeleteProduct = async (req: Request, res: Response) => {
         data: {},
       });
     }
-    //send response
+   
     res.status(200).json({
       success: true,
       message: 'product delete successfully',

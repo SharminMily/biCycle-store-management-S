@@ -1,15 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import { OrderServices } from './order.services';
-import { ProductModel } from '../product/product.model';
-import mongoose from 'mongoose';
 import Order from './order.model';
 import catchAsync from '../../../utils/catchAsync';
 import sendResponse from '../../../utils/sendResponse';
 import httpStatus from "http-status";
 
-interface AuthenticatedRequest extends Request {
-  user?: { email: string; role: string };
-}
+// interface AuthenticatedRequest extends Request {
+//   user?: { email: string; role: string };
+// }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 const createOrder = catchAsync(async (req: Request, res: Response, next: NextFunction) => {

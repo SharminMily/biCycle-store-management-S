@@ -13,5 +13,5 @@ userRouter.post('/', user_controller_1.userController.createUser);
 userRouter.patch('/:id', user_controller_1.userController.getUpdateUser);
 userRouter.delete('/:id', (0, auth_1.default)('admin'), user_controller_1.userController.getDeletedUser);
 // userRouter.get('/', auth(USER_ROLE.admin), userController.getUser);
-userRouter.get('/', user_controller_1.userController.getUser);
+userRouter.get('/', (0, auth_1.default)('admin'), user_controller_1.userController.getUser);
 exports.default = userRouter;

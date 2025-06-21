@@ -13,7 +13,7 @@ const createProductInDB = async (product: Product) => {
 
 const getAllProductFromDB = async (queryParams: any) => {
   try {
-    console.log("Received Query Params:", queryParams); // Debugging
+    console.log("Received Query Params:", queryParams); 
 
     const query = ProductModel.find();
     const queryBuilder = new QueryBuilder(query, queryParams)
@@ -23,10 +23,10 @@ const getAllProductFromDB = async (queryParams: any) => {
       .sort()
       .select();
 
-    console.log("Final Query Before Execution:", queryBuilder.modelQuery.getQuery()); // 🔍 Debugging
+    console.log("Final Query Before Execution:", queryBuilder.modelQuery.getQuery()); 
 
     const result = await queryBuilder.modelQuery;
-    console.log("Final Query Results:", result.length); // 🔍 Debugging
+    console.log("Final Query Results:", result.length); 
 
     return result;
   } catch (error) {
@@ -41,13 +41,6 @@ const getSingleProduct = async (id: string) => {
   const result = await ProductModel.findById(id);
   return result;
 };
-
-
-
-
-
-
-
 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars

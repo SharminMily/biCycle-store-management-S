@@ -27,7 +27,7 @@ const userSchema = new mongoose_1.Schema({
     password: {
         type: String,
         required: true,
-        select: 0
+        select: false
     },
     // needsPasswordChange: {
     //     type: Boolean,
@@ -53,22 +53,13 @@ const userSchema = new mongoose_1.Schema({
 }, {
     timestamps: true
 });
-// userSchema.pre("save", async function (next) {
-//   if (!this.isModified("password")) return next();
-//   const salt = await bcrypt.genSalt(8);
-//   this.password = await bcrypt.hash(this.password, salt);
-//   next();
-// });
-userSchema.pre("save", async function (next) {
-    if (!this.isModified("password"))
-        return next();
-    const saltRounds = Number(config_1.default.bcrypt_salt_rounds) || 10; // Default to 10 if not set
-    this.password = await bcrypt_1.default.hash(this.password, saltRounds);
+userSchema.pre('save', async function (next) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const user = this; // doc
+    // hashing password and save into DB
+    user.password = await bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_rounds));
     next();
 });
-userSchema.statics.isUserExistsByCustomId = async function (id) {
-    return await exports.User.findOne({ id }).select('+password');
-};
 // set '' after saving password
 userSchema.post('save', function (doc, next) {
     doc.password = '';

@@ -1,7 +1,7 @@
 import mongoose, { Schema, Types } from "mongoose";
 
 const orderSchema = new Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },// Ensure `required: true`
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   products: [
     {
       product: { type: Types.ObjectId, ref: "Product", required: true },

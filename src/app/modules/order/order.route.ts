@@ -4,7 +4,6 @@ import auth from '../../../middlewares/auth';
 
 const router = express.Router();
 
-// console.log("OrderControllers:", OrderControllers);
 router.get('/revenue',auth('admin', 'user'),  OrderControllers.calculateAllOrder);
 
 router.get("/verify", auth('admin', 'user'), OrderControllers.verifyPayment);
