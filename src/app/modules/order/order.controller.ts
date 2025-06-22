@@ -28,12 +28,11 @@ const verifyPayment = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     message: "Order verified successfully",
-    data: result, // Now includes full order, user, and product details
+    data: result, 
   });
 });
 
 
-//
 const getAllOrder = async (req: Request, res: Response) => {
   try {
     const result = await OrderServices.getAllOrder();
@@ -44,7 +43,7 @@ const getAllOrder = async (req: Request, res: Response) => {
         error: 'Resource not found',
       });
     }
-    //send response
+   
     res.status(200).json({
       success: true,
       message: 'Product get successfully',
@@ -146,14 +145,14 @@ const calculateAllOrder = async (req: Request, res: Response) => {
     const result = await Order.aggregate([
       {
         $group: {
-          _id: null, // Group all orders
-          totalRevenue: { $sum: '$totalPrice' }, // Calculate total revenue
+          _id: null, 
+          totalRevenue: { $sum: '$totalPrice' }, 
         },
       },
     ]);
 
     const totalRevenue = result[0]?.totalRevenue || 0;
-    // console.log(totalRevenue, 'totalRevenue ')
+   
     res.status(200).json({
       message: 'Revenue calculated successfully',
       status: true,
