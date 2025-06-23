@@ -125,7 +125,7 @@ const getDeleteOrder = async (req: Request, res: Response) => {
         data: [],
       });
     }
-    //send response
+  
     res.status(200).json({
       success: true,
       message: 'Order delete successfully',
