@@ -1,9 +1,14 @@
-import { TUser } from '../src/app/modules/user/user.interface';
+import { TUserRole } from '../src/app/modules/user/user.interface';
 
 declare global {
     namespace Express {
       interface Request {
-        user?: TUser;
+      user?: {
+        userId: string;
+        name: string;
+        email: string;
+        role: TUserRole;
+      };
       }
     }
   }

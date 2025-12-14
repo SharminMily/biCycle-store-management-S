@@ -1,6 +1,8 @@
 
+import AppError from "../../../helpers/AppError";
 import { TUser } from "./user.interface";
 import { User } from "./user.model";
+import { status } from "http-status";
 
 const createUser = async(payload: TUser): Promise< TUser> => {
      const result = await User.create(payload);
@@ -32,12 +34,23 @@ const getUser = async () => {
 
 
 
+const getMe = async (userId: string) => {
+  const user = await User.findById(userId).select('-password');
+
+  if (!user) {
+    throw new AppError(status.NOT_FOUND, 'User not found');
+  }
+
+  return user;
+}; 
+
 export const userServices = {
     createUser,
     getUser,
     getSingleUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    getMe
 }
 
 

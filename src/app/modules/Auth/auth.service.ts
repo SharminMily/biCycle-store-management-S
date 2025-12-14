@@ -1,5 +1,5 @@
 import config from '../../config';
-import { TUser } from '../user/user.interface';
+import { TUser, TUserRole } from '../user/user.interface';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
 import { createToken } from './auth.utils';
@@ -46,7 +46,7 @@ if (userStatus === true) {
     _id: user._id.toString(),
     name: user.name,
     email: user.email,   
-    role: user.role
+    role: user.role as TUserRole
   };
 
   const accessToken = createToken(
@@ -63,6 +63,8 @@ if (userStatus === true) {
 
   return { user, accessToken, refreshToken };
 };
+
+
 
 export const AuthService = {
   register,

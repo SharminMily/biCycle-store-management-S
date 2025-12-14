@@ -10,7 +10,8 @@ authRouter.post('/register', validateRequest(UserValidation.userValidationSchema
 authRouter.post('/login', validateRequest(AuthValidation.loginValidationSchema), AuthControllers.login);
 
 
-
+// // Anyone logged in (no role restriction)
+// router.get('/me', auth(), userController.getMe);
 // authRouter.post("/forget-password", validateRequest(AuthValidation.forgetPasswordValidationSchema) ,AuthControllers.forgetPassword)
 // authRouter.post("/reset-password" ,AuthControllers.resetPassword)
 
