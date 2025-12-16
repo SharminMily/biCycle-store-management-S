@@ -1,4 +1,9 @@
 "use strict";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-namespace */
+// src/middlewares/auth.ts
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -11,42 +16,72 @@ const config_1 = __importDefault(require("../app/config"));
 const user_model_1 = require("../app/modules/user/user.model");
 const auth = (...requiredRoles) => {
     return (0, catchAsync_1.default)(async (req, res, next) => {
+        // Express normalizes headers to lowercase
+        const authHeader = req.headers.authorization;
+        // Check if authorization header exists and is a valid Bearer token
+        if (!authHeader ||
+            typeof authHeader !== 'string' ||
+            !authHeader.startsWith('Bearer ')) {
+            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'No token provided!');
+        }
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'Invalid token format!');
+        }
+        // Verify token
+        let decoded;
         try {
-            const authHeader = req.headers.authorization;
-            if (!authHeader || !authHeader.startsWith('Bearer ')) {
-                console.error("⛔ No token found in request headers!");
-                throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'Token missing! You are not authorized.');
-            }
-            const token = authHeader.split(' ')[1];
-            console.log("🔹 Received Token:", token);
-            let decoded;
-            try {
-                decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_web_token);
-            }
-            catch (error) {
-                console.error("⛔ JWT Verification Failed:", error.message);
-                throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'Invalid or expired token');
-            }
-            console.log("✅ Token Decoded:", decoded);
-            const { role, user: userId } = decoded;
-            const userAuth = await user_model_1.User.findOne({ _id: userId });
-            if (!userAuth) {
-                console.error("⛔ User not found for token:", userId);
-                throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'User not found!');
-            }
-            if (userAuth.status === 'blocked') {
-                throw new AppError_1.default(http_status_1.default.FORBIDDEN, 'User is blocked!');
-            }
-            if (requiredRoles.length && !requiredRoles.includes(role)) {
-                throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'You are not authorized!');
-            }
-            req.user = userAuth;
-            next();
+            decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_web_token);
         }
-        catch (error) {
-            console.error("⛔ Auth Middleware Error:", error.message);
-            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'Invalid or expired token');
+        catch (err) {
+            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'Invalid or expired token!');
         }
+        // Extract userId and role from payload (support both formats)
+        let userId;
+        let roleFromToken;
+        const payload = decoded;
+        if ('_id' in payload && payload._id) {
+            userId = payload._id;
+            roleFromToken = payload.role;
+        }
+        else if ('user' in payload && payload.user) {
+            userId = payload.user;
+            roleFromToken = payload.role;
+        }
+        else {
+            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'Invalid token payload: user ID missing!');
+        }
+        if (!roleFromToken) {
+            throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'Role missing in token!');
+        }
+        // Find user in database
+        const user = await user_model_1.User.findById(userId).select('name email role status isDeleted');
+        if (!user) {
+            throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'User no longer exists!');
+        }
+        if (user.isDeleted) {
+            throw new AppError_1.default(http_status_1.default.FORBIDDEN, 'Account has been deleted!');
+        }
+        if (user.status === 'blocked') {
+            throw new AppError_1.default(http_status_1.default.FORBIDDEN, 'Account is blocked!');
+        }
+        // Ensure required fields are present (TypeScript safety)
+        if (!user.name || !user.email || !user.role) {
+            throw new AppError_1.default(http_status_1.default.INTERNAL_SERVER_ERROR, 'User data incomplete!');
+        }
+        // Use role from DB for authorization (more secure than token)
+        const finalRole = user.role;
+        if (requiredRoles.length > 0 && !requiredRoles.includes(finalRole)) {
+            throw new AppError_1.default(http_status_1.default.FORBIDDEN, 'You do not have permission for this action!');
+        }
+        // Attach verified user to request
+        req.user = {
+            userId: user._id.toString(), // _id is guaranteed to exist after findById success
+            name: user.name,
+            email: user.email,
+            role: finalRole,
+        };
+        next();
     });
 };
 exports.default = auth;

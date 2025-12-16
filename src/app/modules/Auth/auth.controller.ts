@@ -5,34 +5,41 @@ import { AuthService } from "./auth.service";
 import { status } from "http-status";
 
 
-const register = catchAsync(async(req: Request, res: Response)=>{
-    const result = await AuthService.register(req.body);
-    const {  accessToken } = result;
-    sendResponse(res,{
-        statusCode: status.CREATED,
-        status: true,
-        message: "User registered successfully",
-        token: result?.token,
-        data: {
-            accessToken,        
-          },
-    })   
-})
+const register = catchAsync(async (req: Request, res: Response) => {
+  const result = await AuthService.register(req.body);
+  // eslint-disable-next-line no-unused-vars
+  const { result: user, accessToken  } = result; // destructuring করো
+
+  sendResponse(res, {
+    statusCode: status.CREATED,
+    status: true,
+    message: "User registered successfully",
+    token: accessToken, 
+    data: {
+      user, 
+      accessToken,
+     
+    },
+  });
+});
 
 
-const login = catchAsync(async(req: Request, res: Response)=>{
-    const result = await AuthService.login(req.body);
-    const {  accessToken } = result;
-     sendResponse(res,{
-        statusCode: status.ACCEPTED,
-        status: true,
-        message: "User logged in successfully",
-        token: result?.token,
-        data: {
-            accessToken,        
-          },
-    })
-})
+const login = catchAsync(async (req: Request, res: Response) => {
+  const result = await AuthService.login(req.body);
+  const { accessToken, refreshToken, user } = result;
+
+  sendResponse(res, {
+    statusCode: status.OK,
+    status: true,
+    message: "User logged in successfully",
+    token: accessToken, 
+    data: {
+      user,
+      accessToken,
+      refreshToken, 
+    },
+  });
+});
 
 
 

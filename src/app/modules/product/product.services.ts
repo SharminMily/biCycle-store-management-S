@@ -13,7 +13,7 @@ const createProductInDB = async (product: Product) => {
 
 const getAllProductFromDB = async (queryParams: any) => {
   try {
-    console.log("Received Query Params:", queryParams); 
+    // console.log("Received Query Params:", queryParams); 
 
     const query = ProductModel.find();
     const queryBuilder = new QueryBuilder(query, queryParams)
@@ -23,10 +23,10 @@ const getAllProductFromDB = async (queryParams: any) => {
       .sort()
       .select();
 
-    console.log("Final Query Before Execution:", queryBuilder.modelQuery.getQuery()); 
+    // console.log("Final Query Before Execution:", queryBuilder.modelQuery.getQuery()); 
 
     const result = await queryBuilder.modelQuery;
-    console.log("Final Query Results:", result.length); 
+    // console.log("Final Query Results:", result.length); 
 
     return result;
   } catch (error) {

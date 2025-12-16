@@ -41,10 +41,11 @@ const getAllProduct = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {  
+    const err = error as Error;
     res.status(500).json({
       success: false,
       message: "Something went wrong",
-      error: error.message || error,
+      error: err.message || error || "Unknown error occurred",
     });
   }
 };

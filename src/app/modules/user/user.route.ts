@@ -7,7 +7,8 @@ const userRouter = Router();
 userRouter.get('/me', auth(), userController.getMe);
 
 userRouter.get('/:id', auth('admin', 'user'), userController.getSingleUser);
-userRouter.get('/me',   userController.getUser);
+
+// userRouter.get('/me',   userController.getUser);
 
 userRouter.post('/',  userController.createUser)
 

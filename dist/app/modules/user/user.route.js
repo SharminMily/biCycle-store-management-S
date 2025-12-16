@@ -7,7 +7,9 @@ const express_1 = require("express");
 const user_controller_1 = require("./user.controller");
 const auth_1 = __importDefault(require("../../../middlewares/auth"));
 const userRouter = (0, express_1.Router)();
+userRouter.get('/me', (0, auth_1.default)(), user_controller_1.userController.getMe);
 userRouter.get('/:id', (0, auth_1.default)('admin', 'user'), user_controller_1.userController.getSingleUser);
+// userRouter.get('/me',   userController.getUser);
 userRouter.post('/', user_controller_1.userController.createUser);
 // userRouter.post('/create-admin',auth("admin"),  userController.createUser)
 userRouter.patch('/:id', user_controller_1.userController.getUpdateUser);

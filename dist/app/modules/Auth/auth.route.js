@@ -11,6 +11,8 @@ const auth_validation_1 = require("./auth.validation");
 const authRouter = (0, express_1.Router)();
 authRouter.post('/register', (0, validateRequest_1.default)(user_validation_1.UserValidation.userValidationSchema), auth_controller_1.AuthControllers.register);
 authRouter.post('/login', (0, validateRequest_1.default)(auth_validation_1.AuthValidation.loginValidationSchema), auth_controller_1.AuthControllers.login);
+// // Anyone logged in (no role restriction)
+// router.get('/me', auth(), userController.getMe);
 // authRouter.post("/forget-password", validateRequest(AuthValidation.forgetPasswordValidationSchema) ,AuthControllers.forgetPassword)
 // authRouter.post("/reset-password" ,AuthControllers.resetPassword)
 exports.default = authRouter;

@@ -10,23 +10,31 @@ const auth_service_1 = require("./auth.service");
 const http_status_1 = require("http-status");
 const register = (0, catchAsync_1.default)(async (req, res) => {
     const result = await auth_service_1.AuthService.register(req.body);
+    // eslint-disable-next-line no-unused-vars
+    const { result: user, accessToken } = result; // destructuring করো
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.status.CREATED,
         status: true,
         message: "User registered successfully",
-        data: result
+        token: accessToken,
+        data: {
+            user,
+            accessToken,
+        },
     });
 });
 const login = (0, catchAsync_1.default)(async (req, res) => {
     const result = await auth_service_1.AuthService.login(req.body);
-    const { accessToken } = result;
+    const { accessToken, refreshToken, user } = result;
     (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.status.ACCEPTED,
+        statusCode: http_status_1.status.OK,
         status: true,
         message: "User logged in successfully",
-        token: result?.token,
+        token: accessToken,
         data: {
+            user,
             accessToken,
+            refreshToken,
         },
     });
 });

@@ -74,10 +74,31 @@ const getDeletedUser = (0, catchAsync_1.default)(async (req, res) => {
 //       res.status(500).json({ success: false, message: "Internal server error", error });
 //     }
 //   };
+const getMe = (0, catchAsync_1.default)(async (req, res) => {
+    // THIS LINE ONLY — NO req.params ANYWHERE
+    const userId = req.user?.userId;
+    //   console.log('req.user:', req.user);
+    // console.log('userId:', req.user?.userId);
+    // console.log('req.params:', req.params);
+    if (!userId) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: http_status_1.status.UNAUTHORIZED,
+            message: 'Unauthorized - No user data',
+            data: null,
+        });
+    }
+    const result = await user_services_1.userServices.getMe(userId); // or getSingleUser if that's your function name
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.status.OK,
+        message: 'User retrieved successfully',
+        data: result,
+    });
+});
 exports.userController = {
     createUser,
     getUser,
     getSingleUser,
     getUpdateUser,
     getDeletedUser,
+    getMe
 };

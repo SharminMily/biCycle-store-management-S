@@ -4,6 +4,7 @@ import Order from './order.model';
 import catchAsync from '../../../utils/catchAsync';
 import sendResponse from '../../../utils/sendResponse';
 import httpStatus from "http-status";
+import AppError from '../../../helpers/AppError';
 
 // interface AuthenticatedRequest extends Request {
 //   user?: { email: string; role: string };
@@ -11,14 +12,18 @@ import httpStatus from "http-status";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 const createOrder = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  const user =  req.user._id ;
+  if (!req.user) {
+    return next(new AppError(httpStatus.UNAUTHORIZED, "User not authenticated"));
+  }
+
+  const user = req.user._id;
 
   const order = await OrderServices.orderCreate(user, req.body, req.ip!);
 
-    sendResponse(res, {
+  sendResponse(res, {
     statusCode: httpStatus.CREATED,
     message: "Order placed successfully",
-    data: order, 
+    data: order,
   });
 });
 

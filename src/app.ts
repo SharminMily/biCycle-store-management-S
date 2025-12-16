@@ -12,7 +12,7 @@ app.use(
   cors({
     origin: [
      "http://localhost:5173", // Add another origin here
-      "https://bicycle-store-fontend.vercel.app",
+      "https://bicycle-store-two.vercel.app",
     ],
     credentials: true,
   })

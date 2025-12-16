@@ -9,8 +9,15 @@ const order_model_1 = __importDefault(require("./order.model"));
 const catchAsync_1 = __importDefault(require("../../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../../utils/sendResponse"));
 const http_status_1 = __importDefault(require("http-status"));
+const AppError_1 = __importDefault(require("../../../helpers/AppError"));
+// interface AuthenticatedRequest extends Request {
+//   user?: { email: string; role: string };
+// }
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 const createOrder = (0, catchAsync_1.default)(async (req, res, next) => {
+    if (!req.user) {
+        return next(new AppError_1.default(http_status_1.default.UNAUTHORIZED, "User not authenticated"));
+    }
     const user = req.user._id;
     const order = await order_services_1.OrderServices.orderCreate(user, req.body, req.ip);
     (0, sendResponse_1.default)(res, {
@@ -24,10 +31,9 @@ const verifyPayment = (0, catchAsync_1.default)(async (req, res) => {
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,
         message: "Order verified successfully",
-        data: result, // Now includes full order, user, and product details
+        data: result,
     });
 });
-//
 const getAllOrder = async (req, res) => {
     try {
         const result = await order_services_1.OrderServices.getAllOrder();
@@ -38,7 +44,6 @@ const getAllOrder = async (req, res) => {
                 error: 'Resource not found',
             });
         }
-        //send response
         res.status(200).json({
             success: true,
             message: 'Product get successfully',
@@ -117,7 +122,6 @@ const getDeleteOrder = async (req, res) => {
                 data: [],
             });
         }
-        //send response
         res.status(200).json({
             success: true,
             message: 'Order delete successfully',
@@ -137,13 +141,12 @@ const calculateAllOrder = async (req, res) => {
         const result = await order_model_1.default.aggregate([
             {
                 $group: {
-                    _id: null, // Group all orders
-                    totalRevenue: { $sum: '$totalPrice' }, // Calculate total revenue
+                    _id: null,
+                    totalRevenue: { $sum: '$totalPrice' },
                 },
             },
         ]);
         const totalRevenue = result[0]?.totalRevenue || 0;
-        // console.log(totalRevenue, 'totalRevenue ')
         res.status(200).json({
             message: 'Revenue calculated successfully',
             status: true,

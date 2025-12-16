@@ -13,7 +13,7 @@ const orderCreate = async (
   payload: { products: { product: string; quantity: number }[] },
   client_ip: string,
 ) => {
-  console.log('Received user data:', user);
+  // console.log('Received user data:', user);
 
   // If `user` is only an ObjectId (string) or an instance of Types.ObjectId, fetch the full user document
   let fullUser;
@@ -27,7 +27,7 @@ const orderCreate = async (
     throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
   }
 
-  console.log('Fetched Full User:', fullUser);
+  // console.log('Fetched Full User:', fullUser);
 
   // Declare and initialize totalPrice
   let totalPrice = 0;
@@ -65,7 +65,7 @@ const orderCreate = async (
     client_ip,
   };
 
-  console.log('Payment Payload:', shurjopayPayload);
+  // console.log('Payment Payload:', shurjopayPayload);
 
   const payment = await orderUtils.makePaymentAsync(shurjopayPayload);
 
@@ -77,7 +77,7 @@ const orderCreate = async (
       },
     });
   }
-  console.log(payment.checkout_url, 'Payment checkout URL');
+  // console.log(payment.checkout_url, 'Payment checkout URL');
 
   // Return both the checkout URL and the full user document
   return { checkout_url: payment.checkout_url, user: fullUser };

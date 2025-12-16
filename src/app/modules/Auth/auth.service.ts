@@ -29,24 +29,23 @@ const register = async (payload: TUser) => {
 
 
 const login = async (payload: TLoginUser) => {
-// checking if the user is exist
-const user = await User.findOne({ email: payload?.email }).select("+password");
+  // checking if the user is exist
+  const user = await User.findOne({ email: payload?.email }).select("+password");
 
-if (!user) {
-  throw new Error('This user is not found !')
-}
+  if (!user) {
+    throw new Error('This user is not found !');
+  }
 
-// checking if the user is inactive
-const userStatus = user?.isDeleted
+  // checking if the user is inactive
+  const userStatus = user?.isDeleted;
 
-if (userStatus === true) {
-  throw new Error('This user is blocked ! !')
-}
+  if (userStatus === true) {
+    throw new Error('This user is blocked ! !');
+  }
+
   const jwtPayload = {
-    _id: user._id.toString(),
-    name: user.name,
-    email: user.email,   
-    role: user.role as TUserRole
+    user: user._id.toString(),  
+    role: user.role as TUserRole,
   };
 
   const accessToken = createToken(
@@ -63,7 +62,6 @@ if (userStatus === true) {
 
   return { user, accessToken, refreshToken };
 };
-
 
 
 export const AuthService = {

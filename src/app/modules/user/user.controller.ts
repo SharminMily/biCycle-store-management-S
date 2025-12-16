@@ -91,9 +91,9 @@ const createUser = catchAsync(async (req, res) => {
 const getMe = catchAsync(async (req, res) => {
   // THIS LINE ONLY — NO req.params ANYWHERE
   const userId = req.user?.userId;
-  console.log('req.user:', req.user);
-console.log('userId:', req.user?.userId);
-console.log('req.params:', req.params);
+//   console.log('req.user:', req.user);
+// console.log('userId:', req.user?.userId);
+// console.log('req.params:', req.params);
 
 
   if (!userId) {

@@ -13,7 +13,7 @@ const order_utils_1 = require("./order.utils");
 const mongoose_1 = require("mongoose");
 const orderCreate = async (user, // It might be just an ObjectId (string) or the full user document
 payload, client_ip) => {
-    console.log('Received user data:', user);
+    // console.log('Received user data:', user);
     // If `user` is only an ObjectId (string) or an instance of Types.ObjectId, fetch the full user document
     let fullUser;
     if (typeof user === 'string' || user instanceof mongoose_1.Types.ObjectId) {
@@ -25,7 +25,7 @@ payload, client_ip) => {
     if (!fullUser) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'User not found!');
     }
-    console.log('Fetched Full User:', fullUser);
+    // console.log('Fetched Full User:', fullUser);
     // Declare and initialize totalPrice
     let totalPrice = 0;
     // Fetch product details and calculate total price
@@ -56,7 +56,7 @@ payload, client_ip) => {
         customer_city: fullUser.city,
         client_ip,
     };
-    console.log('Payment Payload:', shurjopayPayload);
+    // console.log('Payment Payload:', shurjopayPayload);
     const payment = await order_utils_1.orderUtils.makePaymentAsync(shurjopayPayload);
     if (payment?.transactionStatus) {
         order = await order.updateOne({
@@ -66,7 +66,7 @@ payload, client_ip) => {
             },
         });
     }
-    console.log(payment.checkout_url, 'Payment checkout URL');
+    // console.log(payment.checkout_url, 'Payment checkout URL');
     // Return both the checkout URL and the full user document
     return { checkout_url: payment.checkout_url, user: fullUser };
 };

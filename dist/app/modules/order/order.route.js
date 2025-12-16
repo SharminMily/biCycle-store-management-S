@@ -8,7 +8,6 @@ const express_1 = __importDefault(require("express"));
 const order_controller_1 = require("./order.controller");
 const auth_1 = __importDefault(require("../../../middlewares/auth"));
 const router = express_1.default.Router();
-// console.log("OrderControllers:", OrderControllers);
 router.get('/revenue', (0, auth_1.default)('admin', 'user'), order_controller_1.OrderControllers.calculateAllOrder);
 router.get("/verify", (0, auth_1.default)('admin', 'user'), order_controller_1.OrderControllers.verifyPayment);
 router.get('/:id', (0, auth_1.default)('admin', 'user'), order_controller_1.OrderControllers.getSingleOrder);

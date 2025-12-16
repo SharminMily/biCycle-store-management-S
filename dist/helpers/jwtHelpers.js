@@ -5,16 +5,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.jwtHelpers = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+// Best practice: use 'string' for secret (99% of cases)
 const createToken = (payload, secret, expireTime) => {
     return jsonwebtoken_1.default.sign(payload, secret, {
         expiresIn: expireTime,
     });
 };
-const createResetToken = (
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-payload, secret, expireTime) => {
+const createResetToken = (payload, secret, expireTime) => {
     return jsonwebtoken_1.default.sign(payload, secret, {
-        algorithm: 'HS256',
+        algorithm: 'HS256', // Now accepted without any issues
         expiresIn: expireTime,
     });
 };
@@ -24,5 +23,5 @@ const verifyToken = (token, secret) => {
 exports.jwtHelpers = {
     createToken,
     verifyToken,
-    createResetToken
+    createResetToken,
 };

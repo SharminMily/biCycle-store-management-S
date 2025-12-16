@@ -37,7 +37,6 @@ const getAllProduct = async (req, res) => {
                 error: "Products not found",
             });
         }
-        // Send response
         res.status(200).json({
             success: true,
             message: "Products retrieved successfully",
@@ -45,11 +44,11 @@ const getAllProduct = async (req, res) => {
         });
     }
     catch (error) {
-        //console.error("Error in getAllProduct:", error);
+        const err = error;
         res.status(500).json({
             success: false,
             message: "Something went wrong",
-            error: error.message || error,
+            error: err.message || error || "Unknown error occurred",
         });
     }
 };
@@ -116,7 +115,6 @@ const getDeleteProduct = async (req, res) => {
                 data: {},
             });
         }
-        //send response
         res.status(200).json({
             success: true,
             message: 'product delete successfully',
