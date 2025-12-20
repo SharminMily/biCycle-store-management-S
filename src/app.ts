@@ -18,9 +18,7 @@ app.use(
   })
 );
 
-//aplication router
 app.use('/api', router);
-
 
 const getAController = (req: Request, res: Response) => {
   res.send();
