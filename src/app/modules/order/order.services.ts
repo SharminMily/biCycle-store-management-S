@@ -79,7 +79,7 @@ const orderCreate = async (
   }
   // console.log(payment.checkout_url, 'Payment checkout URL');
 
-  // Return both the checkout URL and the full user document
+ 
   return { checkout_url: payment.checkout_url, user: fullUser };
 };
 

@@ -10,7 +10,8 @@ import { status } from 'http-status';
 const createUser = catchAsync(async (req, res) => {
     const payload = req.body;
     if (!payload.id) {
-      payload.id = uuidv4(); // Generates a unique UUID
+       // Generates a unique UUID
+      payload.id = uuidv4();
     }
     const result = await userServices.createUser(payload);
   
@@ -89,13 +90,8 @@ const createUser = catchAsync(async (req, res) => {
 //   };
 
 const getMe = catchAsync(async (req, res) => {
-  // THIS LINE ONLY — NO req.params ANYWHERE
+  
   const userId = req.user?.userId;
-//   console.log('req.user:', req.user);
-// console.log('userId:', req.user?.userId);
-// console.log('req.params:', req.params);
-
-
   if (!userId) {
     return sendResponse(res, {    
       statusCode: status.UNAUTHORIZED,
@@ -104,7 +100,7 @@ const getMe = catchAsync(async (req, res) => {
     });
   }
 
-  const result = await userServices.getMe(userId); // or getSingleUser if that's your function name
+  const result = await userServices.getMe(userId); 
 
   sendResponse(res, {
         statusCode: status.OK,
