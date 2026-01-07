@@ -12,18 +12,17 @@ import AppError from '../../../helpers/AppError';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 const createOrder = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    return next(new AppError(httpStatus.UNAUTHORIZED, "User not authenticated"));
+  // Ensure user is authenticated
+  if (!req.user?._id) {
+    return next(new AppError(httpStatus.UNAUTHORIZED, 'User not authenticated'));
   }
 
-  const user = req.user._id;
-
-  const order = await OrderServices.orderCreate(user, req.body, req.ip!);
+  const result = await OrderServices.orderCreate(req.user._id, req.body, req.ip || 'unknown');
 
   sendResponse(res, {
-    statusCode: httpStatus.CREATED,
-    message: "Order placed successfully",
-    data: order,
+    statusCode: httpStatus.CREATED,   
+    message: 'Order placed successfully! Redirecting to payment...',
+    data: result,
   });
 });
 

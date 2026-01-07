@@ -9,78 +9,108 @@ import { orderUtils } from './order.utils';
 import { Types } from 'mongoose';
 
 const orderCreate = async (
-  user: TUser | string, // It might be just an ObjectId (string) or the full user document
+  userId: string | Types.ObjectId, // Comes from req.user._id
   payload: { products: { product: string; quantity: number }[] },
   client_ip: string,
 ) => {
-  // console.log('Received user data:', user);
+  // Convert userId to ObjectId if it's a string (this fixes "User not found!")
+  const validUserId =
+    typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
 
-  // If `user` is only an ObjectId (string) or an instance of Types.ObjectId, fetch the full user document
-  let fullUser;
-  if (typeof user === 'string' || user instanceof Types.ObjectId) {
-    fullUser = await User.findById(user);
-  } else {
-    fullUser = user; // Already a full document
-  }
+  // Fetch the full user document
+  const fullUser = await User.findById(validUserId);
 
   if (!fullUser) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
   }
 
-  // console.log('Fetched Full User:', fullUser);
-
-  // Declare and initialize totalPrice
+  // Calculate total price and validate products
   let totalPrice = 0;
 
-  // Fetch product details and calculate total price
   const productDetails = await Promise.all(
     payload.products.map(async (item) => {
-      const product = await ProductModel.findById(item.product);
+      // Convert product ID to ObjectId as well (safety)
+      const productId =
+        typeof item.product === 'string'
+          ? new Types.ObjectId(item.product)
+          : item.product;
+
+      const product = await ProductModel.findById(productId);
+
       if (!product) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Product not found');
+        throw new AppError(httpStatus.NOT_FOUND, `Product not found: ${item.product}`);
       }
-      // Calculate subtotal for this product and add it to totalPrice
-      totalPrice += (product.price || 0) * item.quantity;
-      return { product: product._id, quantity: item.quantity };
+
+      if (product.stock < item.quantity) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          `Insufficient stock for product: ${product.name}`,
+        );
+      }
+
+      // Reduce stock (optional: do this atomically later if needed)
+      // await ProductModel.updateOne({ _id: productId }, { $inc: { stock: -item.quantity } });
+
+      const subtotal = (product.price || 0) * item.quantity;
+      totalPrice += subtotal;
+
+      return {
+        product: product._id,
+        quantity: item.quantity,
+      };
     }),
   );
 
-  // Create the order with the correct user ObjectId
-  let order = await Order.create({
-    user: fullUser._id, // Use the ObjectId from the full user document
+  // Create the order
+  const order = await Order.create({
+    user: fullUser._id,
     products: productDetails,
     totalPrice,
   });
 
-  // Payment integration code
+  // Prepare payment payload for ShurjoPay
   const shurjopayPayload = {
     amount: totalPrice,
-    order_id: order._id,
+    order_id: order._id.toString(),
     currency: 'BDT',
     customer_name: fullUser.name,
-    customer_address: fullUser.address,
+    customer_address: fullUser.address || 'N/A',
     customer_email: fullUser.email,
     customer_phone: fullUser.phone,
-    customer_city: fullUser.city,
+    customer_city: fullUser.city || 'Dhaka',
     client_ip,
   };
 
-  // console.log('Payment Payload:', shurjopayPayload);
-
+  // Initiate payment
   const payment = await orderUtils.makePaymentAsync(shurjopayPayload);
 
-  if (payment?.transactionStatus) {
-    order = await order.updateOne({
-      transaction: {
-        id: payment.sp_order_id,
-        transactionStatus: payment.transactionStatus,
-      },
-    });
-  }
-  // console.log(payment.checkout_url, 'Payment checkout URL');
+  let checkout_url = '';
 
- 
-  return { checkout_url: payment.checkout_url, user: fullUser };
+  if (payment?.checkout_url) {
+    checkout_url = payment.checkout_url;
+
+    // Update order with transaction info
+    await Order.updateOne(
+      { _id: order._id },
+      {
+        transaction: {
+          id: payment.sp_order_id,
+          transactionStatus: payment.transactionStatus || 'Pending',
+        },
+      },
+    );
+  }
+
+  // Return checkout URL and user info (useful for frontend)
+  return {
+    checkout_url,
+    order,
+    user: {
+      name: fullUser.name,
+      email: fullUser.email,
+      phone: fullUser.phone,
+    },
+  };
 };
 
 const verifyPayment = async (order_id: string) => {
